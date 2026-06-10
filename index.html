@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module Status Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Module Status Tracker</h1>
+    <p>Track module and submodule totals with Pass, Fail, On Hold, and Pending counts.</p>
+  </header>
+
+  <main>
+    <section class="input-section">
+      <div class="card">
+        <h2>Add Submodule Total</h2>
+        <form id="testcase-form">
+          <label>
+            Module
+            <input id="module-name" type="text" placeholder="Module name (e.g. SCM, Fin, HCM)" required />
+          </label>
+          <label>
+            Submodule
+            <input id="submodule-name" type="text" placeholder="Submodule name (e.g. AR, AP, GL)" required />
+          </label>
+          <label>
+            Total
+            <input id="total-count-input" type="number" min="0" step="1" placeholder="Example: 20" required />
+          </label>
+          <div class="count-grid">
+            <label>
+              Pass Count
+              <input id="pass-count-input" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              Fail Count
+              <input id="fail-count-input" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              On Hold Count
+              <input id="onhold-count-input" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              Pending for Execution
+              <input id="pending-count-input" type="number" min="0" step="1" value="0" />
+            </label>
+          </div>
+          <label>
+            Comments
+            <input id="comment-text" type="text" placeholder="Optional comments" />
+          </label>
+          <button type="submit">Add Total</button>
+          <p id="form-message" class="form-message" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <div class="card summary-card">
+        <h2>Overall Summary</h2>
+        <div class="summary-grid">
+          <div><strong>Total Submodules</strong><span id="total-count">0</span></div>
+          <div><strong>Total Count</strong><span id="submodule-total-count">0</span></div>
+          <div><strong>Pass</strong><span id="pass-count">0</span></div>
+          <div><strong>Fail</strong><span id="fail-count">0</span></div>
+          <div><strong>OnHold</strong><span id="onhold-count">0</span></div>
+          <div><strong>Pending</strong><span id="pending-count">0</span></div>
+        </div>
+        <button id="export-json">Export Summary</button>
+        <button id="export-excel" type="button">Download Excel</button>
+      </div>
+    </section>
+
+    <section class="table-section card">
+      <h2>Status Table</h2>
+      <div class="table-wrapper">
+        <table id="testcase-table">
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Submodule</th>
+              <th>Total</th>
+              <th>Pass</th>
+              <th>Fail</th>
+              <th>On Hold</th>
+              <th>Pending</th>
+              <th>Status</th>
+              <th>Comments</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
