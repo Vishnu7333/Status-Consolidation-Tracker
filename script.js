@@ -242,6 +242,9 @@ function parseTestcaseForm(event) {
   } else if (countTotal > values.total) {
     setFormError('Counts exceed Total.');
     return;
+  } else if (countTotal < values.total) {
+    setFormError('Counts must equal Total. Fill remaining fields or adjust Total.');
+    return;
   }
 
   if (values.total < countTotal) {
