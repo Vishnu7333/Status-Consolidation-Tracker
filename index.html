@@ -8,6 +8,13 @@
 </head>
 <body>
   <header>
+    <div class="project-banner">
+      <label class="project-name-field">
+        Project Name
+        <input id="project-name" type="text" placeholder="Enter project name" required />
+      </label>
+      <p class="project-display">Project: <span id="project-display">Untitled Project</span></p>
+    </div>
     <h1>Module Status Tracker</h1>
     <p>Track module and submodule totals with Pass, Fail, On Hold, and Pending counts.</p>
   </header>
@@ -27,26 +34,27 @@
           </label>
           <label>
             Total
-            <input id="total-count-input" type="number" min="0" step="1" placeholder="Example: 20" required />
+            <input id="total-count-input" type="number" min="0" step="1" placeholder="Leave blank to auto-calculate" />
           </label>
           <div class="count-grid">
             <label>
               Pass Count
-              <input id="pass-count-input" type="number" min="0" step="1" value="0" />
+              <input id="pass-count-input" type="number" min="0" step="1" placeholder="Leave blank to auto-calculate" />
             </label>
             <label>
               Fail Count
-              <input id="fail-count-input" type="number" min="0" step="1" value="0" />
+              <input id="fail-count-input" type="number" min="0" step="1" placeholder="Leave blank to auto-calculate" />
             </label>
             <label>
               On Hold Count
-              <input id="onhold-count-input" type="number" min="0" step="1" value="0" />
+              <input id="onhold-count-input" type="number" min="0" step="1" placeholder="Leave blank to auto-calculate" />
             </label>
             <label>
               Pending for Execution
-              <input id="pending-count-input" type="number" min="0" step="1" value="0" />
+              <input id="pending-count-input" type="number" min="0" step="1" placeholder="Leave blank to auto-calculate" />
             </label>
           </div>
+          <p class="form-hint">Enter Total and any three counts, or leave one field blank to auto-calculate it.</p>
           <label>
             Comments
             <input id="comment-text" type="text" placeholder="Optional comments" />

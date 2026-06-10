@@ -1,4 +1,6 @@
 const testcaseForm = document.getElementById('testcase-form');
+const projectNameInput = document.getElementById('project-name');
+const projectDisplay = document.getElementById('project-display');
 const moduleInput = document.getElementById('module-name');
 const submoduleInput = document.getElementById('submodule-name');
 const totalCountInput = document.getElementById('total-count-input');
@@ -20,9 +22,29 @@ const exportExcelButton = document.getElementById('export-excel');
 
 const records = [];
 
+function readOptionalCount(input) {
+  const rawValue = input.value.trim();
+  if (rawValue === '') {
+    return null;
+  }
+
+  const number = Number(rawValue);
+  return Number.isFinite(number) && number >= 0 ? number : NaN;
+}
+
 function toCount(value) {
   const number = Number(value);
   return Number.isFinite(number) && number >= 0 ? number : 0;
+}
+
+function setFormError(message) {
+  formMessage.textContent = message;
+  formMessage.classList.add('error');
+}
+
+function clearFormError() {
+  formMessage.textContent = '';
+  formMessage.classList.remove('error');
 }
 
 function getStatus(record) {
@@ -179,34 +201,75 @@ function updateSummaryUI(summary) {
 function parseTestcaseForm(event) {
   event.preventDefault();
 
-  const pass = toCount(passCountInput.value);
-  const fail = toCount(failCountInput.value);
-  const onhold = toCount(onholdCountInput.value);
-  const pending = toCount(pendingCountInput.value);
-  const total = toCount(totalCountInput.value);
-  const enteredTotal = pass + fail + onhold + pending;
-
-  if (enteredTotal > total) {
-    formMessage.textContent = 'We cannot save this record because Pass + Fail + On Hold + Pending is greater than Total.';
-    formMessage.classList.add('error');
+  const projectName = projectNameInput.value.trim();
+  if (!projectName) {
+    setFormError('Project Name is required.');
     return;
   }
 
-  formMessage.textContent = '';
-  formMessage.classList.remove('error');
+  const total = readOptionalCount(totalCountInput);
+  const pass = readOptionalCount(passCountInput);
+  const fail = readOptionalCount(failCountInput);
+  const onhold = readOptionalCount(onholdCountInput);
+  const pending = readOptionalCount(pendingCountInput);
+
+  const values = { total, pass, fail, onhold, pending };
+  if (Object.values(values).some((value) => Number.isNaN(value))) {
+    setFormError('Enter valid non-negative numbers only.');
+    return;
+  }
+
+  const blanks = Object.entries(values)
+    .filter(([, value]) => value === null)
+    .map(([key]) => key);
+
+  if (blanks.length > 1) {
+    setFormError('Leave only one field blank so the app can calculate it.');
+    return;
+  }
+
+  const presentSum = [pass, fail, onhold, pending].reduce((sum, value) => sum + (value ?? 0), 0);
+
+  if (blanks.length === 1) {
+    const missingKey = blanks[0];
+    if (missingKey === 'total') {
+      values.total = presentSum;
+    } else {
+      if (total === null) {
+        setFormError('Enter Total when leaving one status count blank.');
+        return;
+      }
+
+      const missingValue = total - (presentSum - (values[missingKey] ?? 0));
+      if (missingValue < 0) {
+        setFormError('Counts exceed Total.');
+        return;
+      }
+
+      values[missingKey] = missingValue;
+    }
+  } else if (total === null) {
+    values.total = presentSum;
+  } else if (total !== presentSum) {
+    setFormError('Total must equal Pass + Fail + On Hold + Pending. Leave one field blank to auto-calculate it.');
+    return;
+  }
+
+  clearFormError();
 
   const record = {
+    project: projectName,
     module: moduleInput.value.trim(),
     submodule: submoduleInput.value.trim(),
-    pass,
-    fail,
-    onhold,
-    pending,
-    total,
+    total: values.total,
+    pass: values.pass,
+    fail: values.fail,
+    onhold: values.onhold,
+    pending: values.pending,
     comments: commentInput.value.trim(),
   };
 
-  if (!record.module || !record.submodule || Number.isNaN(total)) {
+  if (!record.module || !record.submodule || Number.isNaN(record.total)) {
     return;
   }
 
@@ -214,10 +277,10 @@ function parseTestcaseForm(event) {
   moduleInput.value = '';
   submoduleInput.value = '';
   totalCountInput.value = '';
-  passCountInput.value = '0';
-  failCountInput.value = '0';
-  onholdCountInput.value = '0';
-  pendingCountInput.value = '0';
+  passCountInput.value = '';
+  failCountInput.value = '';
+  onholdCountInput.value = '';
+  pendingCountInput.value = '';
   commentInput.value = '';
 
   refreshDashboard();
@@ -229,8 +292,15 @@ function refreshDashboard() {
 }
 
 function exportSummary() {
+  const projectName = projectNameInput.value.trim();
+  if (!projectName) {
+    setFormError('Project Name is required.');
+    return;
+  }
+
   const summary = summarize();
   const payload = {
+    projectName,
     generatedAt: new Date().toISOString(),
     summary,
     records,
@@ -248,6 +318,7 @@ function exportSummary() {
 }
 
 function getModuleSummaries() {
+  const projectName = projectNameInput.value.trim();
   const groupedRecords = groupByModule();
   return Object.entries(groupedRecords).map(([moduleName, moduleRecords]) => {
     const summary = moduleRecords.reduce(
@@ -269,6 +340,7 @@ function getModuleSummaries() {
     );
 
     return {
+      project: projectName,
       module: moduleName,
       submodules: moduleRecords.map((record) => record.submodule).join(', '),
       total: summary.total,
@@ -283,39 +355,60 @@ function getModuleSummaries() {
 
 async function downloadExcel() {
   if (!records.length) {
-    formMessage.textContent = 'Add at least one record before downloading Excel.';
-    formMessage.classList.add('error');
+    setFormError('Add at least one record before downloading Excel.');
     return;
   }
 
   try {
     const XLSX = await import('https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs');
-    const moduleSheetData = getModuleSummaries();
-    const detailSheetData = records.map((record) => ({
-      Module: record.module,
-      Submodule: record.submodule,
-      Total: record.total,
-      Pass: record.pass,
-      Fail: record.fail,
-      'On Hold': record.onhold,
-      Pending: record.pending,
-      Status: getStatus(record),
-      Comments: record.comments || '-',
-    }));
+    const projectName = projectNameInput.value.trim();
+    if (!projectName) {
+      setFormError('Project Name is required.');
+      return;
+    }
+
+    const groupedRecords = groupByModule();
+    const summaryRows = [[`Project: ${projectName}`], [], ['Module', 'Submodule', 'Total', 'Pass', 'Fail', 'On Hold', 'Pending', 'Status', 'Comments']];
+    const summaryMerges = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
+
+    Object.entries(groupedRecords).forEach(([moduleName, moduleRecords]) => {
+      const moduleHeaderRowIndex = summaryRows.length;
+      summaryRows.push([moduleName, '', '', '', '', '', '', '', '']);
+      summaryMerges.push({ s: { r: moduleHeaderRowIndex, c: 0 }, e: { r: moduleHeaderRowIndex, c: 8 } });
+
+      moduleRecords.forEach((record) => {
+        summaryRows.push(['', record.submodule, record.total, record.pass, record.fail, record.onhold, record.pending, getStatus(record), record.comments || '-']);
+      });
+    });
 
     const workbook = XLSX.utils.book_new();
-    const moduleSheet = XLSX.utils.json_to_sheet(moduleSheetData);
-    const detailSheet = XLSX.utils.json_to_sheet(detailSheetData);
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryRows);
+    summarySheet['!merges'] = summaryMerges;
 
-    XLSX.utils.book_append_sheet(workbook, moduleSheet, 'Module Summary');
-    XLSX.utils.book_append_sheet(workbook, detailSheet, 'Submodule Details');
+    if (summarySheet['A1']) {
+      summarySheet['A1'].s = {
+        alignment: { horizontal: 'center', vertical: 'center' },
+        font: { bold: true, sz: 14 },
+      };
+    }
+
+    summaryMerges.slice(1).forEach((merge) => {
+      const cellRef = XLSX.utils.encode_cell({ r: merge.s.r, c: merge.s.c });
+      if (summarySheet[cellRef]) {
+        summarySheet[cellRef].s = {
+          alignment: { horizontal: 'center', vertical: 'center' },
+          font: { bold: true },
+        };
+      }
+    });
+
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
 
     formMessage.textContent = '';
     formMessage.classList.remove('error');
     XLSX.writeFile(workbook, 'module-status-tracker.xlsx');
   } catch (error) {
-    formMessage.textContent = 'Excel download is unavailable right now. Please try again.';
-    formMessage.classList.add('error');
+    setFormError('Excel download is unavailable right now. Please try again.');
   }
 }
 
@@ -336,6 +429,12 @@ function init() {
   testcaseTableBody.addEventListener('click', removeRecord);
   exportButton.addEventListener('click', exportSummary);
   exportExcelButton.addEventListener('click', downloadExcel);
+  projectNameInput.addEventListener('input', () => {
+    const projectName = projectNameInput.value.trim();
+    projectDisplay.textContent = projectName || 'Untitled Project';
+    document.title = projectName ? `${projectName} - Module Status Tracker` : 'Module Status Tracker';
+  });
+  projectDisplay.textContent = projectNameInput.value.trim() || 'Untitled Project';
   refreshDashboard();
 }
 
