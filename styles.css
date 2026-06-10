@@ -151,6 +151,102 @@ button:hover {
   font-weight: 700;
 }
 
+.export-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.image-report {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1200px;
+  padding: 32px;
+  background: #ffffff;
+  color: #172033;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.image-report-header {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  border-radius: 8px;
+  background: #1f4e78;
+  color: #ffffff;
+  text-align: center;
+}
+
+.image-report-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.image-report-header p {
+  margin: 0;
+  color: rgba(255,255,255,0.86);
+  opacity: 1;
+}
+
+.image-report-summary {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.image-report-summary div {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem;
+  border: 1px solid #c9d7e6;
+  border-radius: 8px;
+  background: #f4f8fc;
+}
+
+.image-report-summary strong {
+  color: #35506b;
+  font-size: 0.85rem;
+}
+
+.image-report-summary span {
+  color: #172033;
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.image-report-table {
+  width: 100%;
+  min-width: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #ffffff;
+}
+
+.image-report-table th,
+.image-report-table td {
+  padding: 0.7rem;
+  border: 1px solid #c9d7e6;
+  color: #172033;
+  font-size: 0.86rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.image-report-table th {
+  background: #d9eaf7;
+  color: #17365d;
+  font-weight: 800;
+}
+
+.image-report-module-row td {
+  background: #eef4fb;
+  color: #17365d;
+  font-weight: 800;
+}
+
 .table-section {
   overflow-x: auto;
 }

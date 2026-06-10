@@ -19,6 +19,7 @@ const onholdCountEl = document.getElementById('onhold-count');
 const pendingCountEl = document.getElementById('pending-count');
 const exportButton = document.getElementById('export-json');
 const exportExcelButton = document.getElementById('export-excel');
+const exportImageButton = document.getElementById('export-image');
 
 const records = [];
 
@@ -330,6 +331,153 @@ function exportSummary() {
   URL.revokeObjectURL(url);
 }
 
+function createImageReport() {
+  const projectName = projectNameInput.value.trim() || 'Untitled Project';
+  const summary = summarize();
+  const report = document.createElement('section');
+  report.className = 'image-report';
+
+  const header = document.createElement('div');
+  header.className = 'image-report-header';
+
+  const title = document.createElement('h1');
+  title.textContent = projectName;
+
+  const subtitle = document.createElement('p');
+  subtitle.textContent = 'Module Status Tracker';
+
+  header.append(title, subtitle);
+  report.appendChild(header);
+
+  const summaryGrid = document.createElement('div');
+  summaryGrid.className = 'image-report-summary';
+
+  [
+    ['Total Submodules', summary.totalSubmodules],
+    ['Total Count', summary.total],
+    ['Pass', summary.pass],
+    ['Fail', summary.fail],
+    ['On Hold', summary.onhold],
+    ['Pending', summary.pending],
+  ].forEach(([label, value]) => {
+    const item = document.createElement('div');
+    const strong = document.createElement('strong');
+    const count = document.createElement('span');
+    strong.textContent = label;
+    count.textContent = value;
+    item.append(strong, count);
+    summaryGrid.appendChild(item);
+  });
+
+  report.appendChild(summaryGrid);
+
+  const table = document.createElement('table');
+  table.className = 'image-report-table';
+  const thead = document.createElement('thead');
+  thead.innerHTML = `
+    <tr>
+      <th>Module</th>
+      <th>Submodule</th>
+      <th>Total</th>
+      <th>Pass</th>
+      <th>Fail</th>
+      <th>On Hold</th>
+      <th>Pending</th>
+      <th>Status</th>
+      <th>Comments</th>
+    </tr>
+  `;
+
+  const tbody = document.createElement('tbody');
+  if (!records.length) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 9;
+    cell.className = 'empty-state';
+    cell.textContent = 'No status records available.';
+    row.appendChild(cell);
+    tbody.appendChild(row);
+  } else {
+    Object.entries(groupByModule()).forEach(([moduleName, moduleRecords]) => {
+      const moduleSummary = moduleRecords.reduce(
+        (accumulator, record) => {
+          accumulator.total += record.total;
+          accumulator.pass += record.pass;
+          accumulator.fail += record.fail;
+          accumulator.onhold += record.onhold;
+          accumulator.pending += record.pending;
+          return accumulator;
+        },
+        { total: 0, pass: 0, fail: 0, onhold: 0, pending: 0 },
+      );
+
+      const moduleRow = document.createElement('tr');
+      moduleRow.className = 'image-report-module-row';
+      const moduleCell = document.createElement('td');
+      moduleCell.colSpan = 9;
+      moduleCell.textContent = `${moduleName} - Total: ${moduleSummary.total} | Pass: ${moduleSummary.pass} | Fail: ${moduleSummary.fail} | On Hold: ${moduleSummary.onhold} | Pending: ${moduleSummary.pending} | Status: ${getModuleStatus(moduleSummary)}`;
+      moduleRow.appendChild(moduleCell);
+      tbody.appendChild(moduleRow);
+
+      moduleRecords.forEach((record) => {
+        const row = document.createElement('tr');
+        [
+          record.module,
+          record.submodule,
+          record.total,
+          record.pass,
+          record.fail,
+          record.onhold,
+          record.pending,
+          getStatus(record),
+          record.comments || '-',
+        ].forEach((value) => {
+          const cell = document.createElement('td');
+          cell.textContent = value;
+          row.appendChild(cell);
+        });
+        tbody.appendChild(row);
+      });
+    });
+  }
+
+  table.append(thead, tbody);
+  report.appendChild(table);
+  return report;
+}
+
+async function downloadStatusImage() {
+  const html2canvas = window.html2canvas;
+  if (!html2canvas) {
+    setFormError('Image download library is not loaded. Please refresh the page and try again.');
+    return;
+  }
+
+  const projectName = projectNameInput.value.trim() || 'module-status-tracker';
+  const fileName = `${projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'module-status-tracker'}-status.png`;
+  const report = createImageReport();
+  document.body.appendChild(report);
+
+  try {
+    clearFormError();
+    const canvas = await html2canvas(report, {
+      backgroundColor: '#ffffff',
+      scale: Math.min(window.devicePixelRatio || 1, 2),
+    });
+
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    setFormError('Image download is unavailable right now. Please try again.');
+  } finally {
+    report.remove();
+  }
+}
+
 function getModuleSummaries() {
   const projectName = projectNameInput.value.trim();
   const groupedRecords = groupByModule();
@@ -531,6 +679,7 @@ function init() {
   testcaseTableBody.addEventListener('click', removeRecord);
   exportButton.addEventListener('click', exportSummary);
   exportExcelButton.addEventListener('click', downloadExcel);
+  exportImageButton.addEventListener('click', downloadStatusImage);
   projectNameInput.addEventListener('input', () => {
     const projectName = projectNameInput.value.trim();
     projectDisplay.textContent = projectName || 'Untitled Project';

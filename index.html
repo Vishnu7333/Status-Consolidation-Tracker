@@ -74,8 +74,11 @@
           <div><strong>OnHold</strong><span id="onhold-count">0</span></div>
           <div><strong>Pending</strong><span id="pending-count">0</span></div>
         </div>
-        <button id="export-json">Export Summary</button>
-        <button id="export-excel" type="button">Download Excel</button>
+        <div class="export-actions">
+          <button id="export-json">Export Summary</button>
+          <button id="export-excel" type="button">Download Excel</button>
+          <button id="export-image" type="button">Download Image</button>
+        </div>
       </div>
     </section>
 
@@ -104,6 +107,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script type="module" src="script.js"></script>
 </body>
 </html>
