@@ -67,6 +67,10 @@ function getStatus(record) {
   return 'Pending';
 }
 
+function findRecordIndex(moduleName, submoduleName) {
+  return records.findIndex((record) => record.module === moduleName && record.submodule === submoduleName);
+}
+
 function groupByModule() {
   return records.reduce((groups, record) => {
     const key = record.module;
@@ -273,7 +277,23 @@ function parseTestcaseForm(event) {
     return;
   }
 
-  records.push(record);
+  const existingIndex = findRecordIndex(record.module, record.submodule);
+  if (existingIndex >= 0) {
+    const existingRecord = records[existingIndex];
+    records[existingIndex] = {
+      ...existingRecord,
+      project: projectName,
+      total: existingRecord.total + record.total,
+      pass: existingRecord.pass + record.pass,
+      fail: existingRecord.fail + record.fail,
+      onhold: existingRecord.onhold + record.onhold,
+      pending: existingRecord.pending + record.pending,
+      comments: [existingRecord.comments, record.comments].filter(Boolean).join(' | '),
+    };
+  } else {
+    records.push(record);
+  }
+  clearFormError();
   moduleInput.value = '';
   submoduleInput.value = '';
   totalCountInput.value = '';
