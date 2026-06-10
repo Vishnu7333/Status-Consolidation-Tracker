@@ -372,13 +372,14 @@ async function downloadExcel() {
     const summaryMerges = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
 
     Object.entries(groupedRecords).forEach(([moduleName, moduleRecords]) => {
-      const moduleHeaderRowIndex = summaryRows.length;
-      summaryRows.push([moduleName, '', '', '', '', '', '', '', '']);
-      summaryMerges.push({ s: { r: moduleHeaderRowIndex, c: 0 }, e: { r: moduleHeaderRowIndex, c: 8 } });
-
+      const moduleStartRow = summaryRows.length;
       moduleRecords.forEach((record) => {
-        summaryRows.push(['', record.submodule, record.total, record.pass, record.fail, record.onhold, record.pending, getStatus(record), record.comments || '-']);
+        summaryRows.push([moduleName, record.submodule, record.total, record.pass, record.fail, record.onhold, record.pending, getStatus(record), record.comments || '-']);
       });
+
+      if (moduleRecords.length > 1) {
+        summaryMerges.push({ s: { r: moduleStartRow, c: 0 }, e: { r: summaryRows.length - 1, c: 0 } });
+      }
     });
 
     const workbook = XLSX.utils.book_new();
