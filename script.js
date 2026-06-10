@@ -479,7 +479,7 @@ async function downloadExcel() {
       const cellRef = XLSX.utils.encode_cell({ r: merge.s.r, c: merge.s.c });
       if (summarySheet[cellRef]) {
         summarySheet[cellRef].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
+          alignment: { horizontal: 'left', vertical: 'top' },
           font: { bold: true },
           border: thinBorder,
         };
