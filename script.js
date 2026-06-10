@@ -373,6 +373,19 @@ function getModuleSummaries() {
   });
 }
 
+function buildCellStyle(thinBorder, rowIndex, columnIndex) {
+  const style = {
+    alignment: { horizontal: rowIndex <= 2 ? 'center' : 'left', vertical: 'center' },
+    border: thinBorder,
+  };
+
+  if (rowIndex === 0 || rowIndex === 2 || (columnIndex === 0 && rowIndex > 2)) {
+    style.font = { bold: true };
+  }
+
+  return style;
+}
+
 async function downloadExcel() {
   if (!records.length) {
     setFormError('Add at least one record before downloading Excel.');
@@ -380,7 +393,12 @@ async function downloadExcel() {
   }
 
   try {
-    const XLSX = await import('https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs');
+    const XLSX = window.XLSX;
+    if (!XLSX) {
+      setFormError('Excel library is not loaded. Please refresh the page and try again.');
+      return;
+    }
+
     const projectName = projectNameInput.value.trim();
     if (!projectName) {
       setFormError('Project Name is required.');
@@ -402,14 +420,47 @@ async function downloadExcel() {
       }
     });
 
+    const summaryTotals = summarize();
+    summaryRows.push([]);
+    summaryRows.push([
+      'Grand Total',
+      '',
+      summaryTotals.total,
+      summaryTotals.pass,
+      summaryTotals.fail,
+      summaryTotals.onhold,
+      summaryTotals.pending,
+      '',
+      '',
+    ]);
+
     const workbook = XLSX.utils.book_new();
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryRows);
     summarySheet['!merges'] = summaryMerges;
+
+    const thinBorder = {
+      top: { style: 'thin', color: { rgb: '000000' } },
+      bottom: { style: 'thin', color: { rgb: '000000' } },
+      left: { style: 'thin', color: { rgb: '000000' } },
+      right: { style: 'thin', color: { rgb: '000000' } },
+    };
+
+    summaryRows.forEach((row, rowIndex) => {
+      row.forEach((cellValue, columnIndex) => {
+        const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
+        if (!summarySheet[cellRef]) {
+          return;
+        }
+
+        summarySheet[cellRef].s = buildCellStyle(thinBorder, rowIndex, columnIndex);
+      });
+    });
 
     if (summarySheet['A1']) {
       summarySheet['A1'].s = {
         alignment: { horizontal: 'center', vertical: 'center' },
         font: { bold: true, sz: 14 },
+        border: thinBorder,
       };
     }
 
@@ -418,6 +469,19 @@ async function downloadExcel() {
       if (summarySheet[cellRef]) {
         summarySheet[cellRef].s = {
           alignment: { horizontal: 'center', vertical: 'center' },
+          font: { bold: true },
+          border: thinBorder,
+        };
+      }
+    });
+
+    const grandTotalRowIndex = summaryRows.length - 1;
+    [0, 2, 3, 4, 5, 6].forEach((columnIndex) => {
+      const cellRef = XLSX.utils.encode_cell({ r: grandTotalRowIndex, c: columnIndex });
+      if (summarySheet[cellRef]) {
+        summarySheet[cellRef].s = {
+          alignment: { horizontal: columnIndex === 0 ? 'left' : 'center', vertical: 'center' },
+          border: thinBorder,
           font: { bold: true },
         };
       }
