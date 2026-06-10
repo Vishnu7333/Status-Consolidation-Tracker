@@ -372,8 +372,13 @@ function buildCellStyle(thinBorder, rowIndex, columnIndex) {
     border: thinBorder,
   };
 
+  if (rowIndex === 2) {
+    style.fill = { fgColor: { rgb: 'D9EAF7' } };
+    style.font = { bold: true, color: { rgb: '17365D' }, sz: 12 };
+  }
+
   if (rowIndex === 0 || rowIndex === 2 || (columnIndex === 0 && rowIndex > 2)) {
-    style.font = { bold: true };
+    style.font = { ...style.font, bold: true };
   }
 
   return style;
@@ -430,6 +435,18 @@ async function downloadExcel() {
     const workbook = XLSX.utils.book_new();
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryRows);
     summarySheet['!merges'] = summaryMerges;
+    summarySheet['!cols'] = [
+      { wch: 22 },
+      { wch: 24 },
+      { wch: 12 },
+      { wch: 12 },
+      { wch: 12 },
+      { wch: 14 },
+      { wch: 14 },
+      { wch: 14 },
+      { wch: 28 },
+    ];
+    summarySheet['!rows'] = [{ hpt: 30 }, { hpt: 8 }, { hpt: 23 }];
 
     const thinBorder = {
       top: { style: 'thin', color: { rgb: '000000' } },
@@ -452,7 +469,8 @@ async function downloadExcel() {
     if (summarySheet['A1']) {
       summarySheet['A1'].s = {
         alignment: { horizontal: 'center', vertical: 'center' },
-        font: { bold: true, sz: 14 },
+        fill: { fgColor: { rgb: '1F4E78' } },
+        font: { bold: true, sz: 18, color: { rgb: 'FFFFFF' } },
         border: thinBorder,
       };
     }
@@ -469,13 +487,19 @@ async function downloadExcel() {
     });
 
     const grandTotalRowIndex = summaryRows.length - 1;
-    [0, 2, 3, 4, 5, 6].forEach((columnIndex) => {
+    summarySheet['!rows'][grandTotalRowIndex] = { hpt: 26 };
+    Array.from({ length: 9 }, (_, columnIndex) => columnIndex).forEach((columnIndex) => {
       const cellRef = XLSX.utils.encode_cell({ r: grandTotalRowIndex, c: columnIndex });
+      if (!summarySheet[cellRef]) {
+        summarySheet[cellRef] = { t: 's', v: '' };
+      }
+
       if (summarySheet[cellRef]) {
         summarySheet[cellRef].s = {
           alignment: { horizontal: columnIndex === 0 ? 'left' : 'center', vertical: 'center' },
           border: thinBorder,
-          font: { bold: true },
+          fill: { fgColor: { rgb: 'FFF2CC' } },
+          font: { bold: true, sz: 13, color: { rgb: '7F6000' } },
         };
       }
     });
