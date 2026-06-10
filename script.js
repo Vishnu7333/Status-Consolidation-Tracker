@@ -223,39 +223,28 @@ function parseTestcaseForm(event) {
     return;
   }
 
-  const blanks = Object.entries(values)
-    .filter(([, value]) => value === null)
-    .map(([key]) => key);
+  const countFields = ['pass', 'fail', 'onhold', 'pending'];
+  const blankCountFields = countFields.filter((fieldName) => values[fieldName] === null);
+  const countTotal = countFields.reduce((sum, fieldName) => sum + (values[fieldName] ?? 0), 0);
 
-  if (blanks.length > 1) {
-    setFormError('Leave only one field blank so the app can calculate it.');
+  if (values.total === null) {
+    values.total = countTotal;
+  } else if (blankCountFields.length === 1) {
+    const missingField = blankCountFields[0];
+    const missingValue = values.total - countTotal;
+    if (missingValue < 0) {
+      setFormError('Counts exceed Total.');
+      return;
+    }
+
+    values[missingField] = missingValue;
+  } else if (countTotal > values.total) {
+    setFormError('Counts exceed Total.');
     return;
   }
 
-  const presentSum = [pass, fail, onhold, pending].reduce((sum, value) => sum + (value ?? 0), 0);
-
-  if (blanks.length === 1) {
-    const missingKey = blanks[0];
-    if (missingKey === 'total') {
-      values.total = presentSum;
-    } else {
-      if (total === null) {
-        setFormError('Enter Total when leaving one status count blank.');
-        return;
-      }
-
-      const missingValue = total - (presentSum - (values[missingKey] ?? 0));
-      if (missingValue < 0) {
-        setFormError('Counts exceed Total.');
-        return;
-      }
-
-      values[missingKey] = missingValue;
-    }
-  } else if (total === null) {
-    values.total = presentSum;
-  } else if (total !== presentSum) {
-    setFormError('Total must equal Pass + Fail + On Hold + Pending. Leave one field blank to auto-calculate it.');
+  if (values.total < countTotal) {
+    setFormError('Counts exceed Total.');
     return;
   }
 
