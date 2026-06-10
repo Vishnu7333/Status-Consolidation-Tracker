@@ -248,6 +248,10 @@ function parseTestcaseForm(event) {
     return;
   }
 
+  countFields.forEach((fieldName) => {
+    values[fieldName] = toCount(values[fieldName]);
+  });
+
   clearFormError();
 
   const record = {
