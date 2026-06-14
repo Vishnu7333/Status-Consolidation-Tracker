@@ -171,7 +171,7 @@ function createRow(record, index) {
     <td class="status-pending">${record.pending}</td>
     <td>${status}</td>
     <td>${record.comments || '-'}</td>
-    <td><button class="remove-button" data-index="${index}">Remove</button></td>
+    <td><button class="remove-button" data-index="${index}" aria-label="Remove record">×</button></td>
   `;
   return tr;
 }

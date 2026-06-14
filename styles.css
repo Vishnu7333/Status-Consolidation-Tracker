@@ -120,12 +120,30 @@ button {
   font-weight: 600;
   color: #fff;
   background: #4f7dff;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 button:hover {
   transform: translateY(-1px);
   background: #2d5cff;
+}
+
+.remove-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 12px;
+  background: rgba(255, 106, 112, 0.13);
+  color: #ff6a70;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.remove-button:hover {
+  background: rgba(255, 106, 112, 0.25);
 }
 
 .form-message {
@@ -154,15 +172,31 @@ button:hover {
 
 .summary-grid div {
   display: grid;
-  gap: 0.3rem;
-  padding: 1rem;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.04);
+  gap: 0.35rem;
+  padding: 1.1rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(48, 79, 255, 0.18), rgba(82, 198, 255, 0.12));
+  border: 1px solid rgba(94, 149, 255, 0.35);
+  box-shadow: 0 14px 30px rgba(8, 24, 64, 0.18);
 }
 
+.summary-grid div:nth-child(1) { background: linear-gradient(135deg, rgba(111, 197, 255, 0.2), rgba(31, 57, 255, 0.18)); }
+.summary-grid div:nth-child(2) { background: linear-gradient(135deg, rgba(255, 175, 189, 0.18), rgba(255, 120, 150, 0.16)); }
+.summary-grid div:nth-child(3) { background: linear-gradient(135deg, rgba(145, 255, 199, 0.18), rgba(52, 193, 145, 0.16)); }
+.summary-grid div:nth-child(4) { background: linear-gradient(135deg, rgba(255, 206, 122, 0.18), rgba(255, 143, 64, 0.16)); }
+.summary-grid div:nth-child(5) { background: linear-gradient(135deg, rgba(255, 179, 204, 0.16), rgba(212, 95, 244, 0.16)); }
+.summary-grid div:nth-child(6) { background: linear-gradient(135deg, rgba(162, 135, 255, 0.18), rgba(64, 175, 255, 0.14)); }
+
 .summary-grid span {
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.summary-grid strong {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.02em;
 }
 
 .export-actions {
