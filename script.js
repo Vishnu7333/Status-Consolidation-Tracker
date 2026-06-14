@@ -505,10 +505,14 @@ function createImageReport() {
       moduleRow.appendChild(moduleCell);
       tbody.appendChild(moduleRow);
 
-      moduleRecords.forEach((record) => {
+      moduleRecords.forEach((record, recordIndex) => {
         const row = document.createElement('tr');
+
+        const moduleCell = document.createElement('td');
+        moduleCell.textContent = recordIndex === 0 ? record.module : '';
+        row.appendChild(moduleCell);
+
         [
-          record.module,
           record.submodule,
           record.total,
           record.pass,
@@ -600,18 +604,31 @@ function getModuleSummaries() {
   });
 }
 
-function buildCellStyle(thinBorder, rowIndex, columnIndex) {
+function buildCellStyle(thinBorder, rowIndex, columnIndex, grandTotalRowIndex) {
+  const isHeaderRow = rowIndex === 2;
+  const isProjectRow = rowIndex === 0;
+  const isGrandTotalRow = rowIndex === grandTotalRowIndex;
+  const isNumericColumn = columnIndex >= 2 && columnIndex <= 6;
+
   const style = {
-    alignment: { horizontal: rowIndex <= 2 ? 'center' : 'left', vertical: 'center' },
+    alignment: {
+      horizontal: isProjectRow || isHeaderRow ? 'center' : isNumericColumn ? 'center' : 'left',
+      vertical: 'center',
+    },
     border: thinBorder,
   };
 
-  if (rowIndex === 2) {
+  if (isGrandTotalRow) {
+    style.alignment.horizontal = columnIndex === 0 ? 'left' : 'center';
+    style.fill = { fgColor: { rgb: 'FFF2CC' } };
+  }
+
+  if (isHeaderRow) {
     style.fill = { fgColor: { rgb: 'D9EAF7' } };
     style.font = { bold: true, color: { rgb: '17365D' }, sz: 12 };
   }
 
-  if (rowIndex === 0 || rowIndex === 2 || (columnIndex === 0 && rowIndex > 2)) {
+  if (isProjectRow || isHeaderRow || (columnIndex === 0 && rowIndex > 2)) {
     style.font = { ...style.font, bold: true };
   }
 
@@ -689,6 +706,7 @@ async function downloadExcel() {
       right: { style: 'thin', color: { rgb: '000000' } },
     };
 
+    const grandTotalRowIndex = summaryRows.length - 1;
     summaryRows.forEach((row, rowIndex) => {
       row.forEach((cellValue, columnIndex) => {
         const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
@@ -696,7 +714,7 @@ async function downloadExcel() {
           return;
         }
 
-        summarySheet[cellRef].s = buildCellStyle(thinBorder, rowIndex, columnIndex);
+        summarySheet[cellRef].s = buildCellStyle(thinBorder, rowIndex, columnIndex, grandTotalRowIndex);
       });
     });
 
@@ -720,7 +738,6 @@ async function downloadExcel() {
       }
     });
 
-    const grandTotalRowIndex = summaryRows.length - 1;
     summarySheet['!rows'][grandTotalRowIndex] = { hpt: 26 };
     Array.from({ length: 9 }, (_, columnIndex) => columnIndex).forEach((columnIndex) => {
       const cellRef = XLSX.utils.encode_cell({ r: grandTotalRowIndex, c: columnIndex });
