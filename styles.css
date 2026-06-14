@@ -92,6 +92,20 @@ select {
   color: #f5f7ff;
 }
 
+input.field-error-active,
+select.field-error-active {
+  border-color: #ff6a70;
+  background: rgba(255, 106, 112, 0.1);
+}
+
+.field-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: #ff6a70;
+  min-height: 1rem;
+}
+
 input:focus,
 select:focus {
   outline: 2px solid rgba(79, 125, 255, 0.55);

@@ -63,6 +63,33 @@ function clearFormError() {
   formMessage.classList.remove('error');
 }
 
+function setFieldError(field, message) {
+  const errorSpan = document.getElementById(`${field.id}-error`);
+  if (errorSpan) {
+    errorSpan.textContent = message;
+    field.classList.add('field-error-active');
+  }
+}
+
+function scrollToField(field) {
+  if (field && typeof field.scrollIntoView === 'function') {
+    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    field.focus({ preventScroll: true });
+  }
+}
+
+function clearFieldError(field) {
+  const errorSpan = document.getElementById(`${field.id}-error`);
+  if (errorSpan) {
+    errorSpan.textContent = '';
+    field.classList.remove('field-error-active');
+  }
+}
+
+function clearAllFieldErrors() {
+  [projectNameInput, moduleInput, submoduleInput, totalCountInput, passCountInput, failCountInput, onholdCountInput, pendingCountInput].forEach((field) => clearFieldError(field));
+}
+
 function getStatus(record) {
   if (record.total > 0 && record.pass === record.total) {
     return 'Pass';
@@ -221,9 +248,11 @@ function updateSummaryUI(summary) {
 function parseTestcaseForm(event) {
   event.preventDefault();
 
+  clearAllFieldErrors();
   const projectName = projectNameInput.value.trim();
   if (!projectName) {
-    setFormError('Project Name is required.');
+    setFieldError(projectNameInput, 'Project Name is required.');
+    scrollToField(projectNameInput);
     return;
   }
 
@@ -235,7 +264,42 @@ function parseTestcaseForm(event) {
 
   const values = { total, pass, fail, onhold, pending };
   if (Object.values(values).some((value) => Number.isNaN(value))) {
-    setFormError('Enter valid non-negative numbers only.');
+    let scrolled = false;
+    if (isNaN(total)) {
+      setFieldError(totalCountInput, 'Enter a valid non-negative number.');
+      if (!scrolled) {
+        scrollToField(totalCountInput);
+        scrolled = true;
+      }
+    }
+    if (isNaN(pass)) {
+      setFieldError(passCountInput, 'Enter a valid non-negative number.');
+      if (!scrolled) {
+        scrollToField(passCountInput);
+        scrolled = true;
+      }
+    }
+    if (isNaN(fail)) {
+      setFieldError(failCountInput, 'Enter a valid non-negative number.');
+      if (!scrolled) {
+        scrollToField(failCountInput);
+        scrolled = true;
+      }
+    }
+    if (isNaN(onhold)) {
+      setFieldError(onholdCountInput, 'Enter a valid non-negative number.');
+      if (!scrolled) {
+        scrollToField(onholdCountInput);
+        scrolled = true;
+      }
+    }
+    if (isNaN(pending)) {
+      setFieldError(pendingCountInput, 'Enter a valid non-negative number.');
+      if (!scrolled) {
+        scrollToField(pendingCountInput);
+        scrolled = true;
+      }
+    }
     return;
   }
 
@@ -249,21 +313,25 @@ function parseTestcaseForm(event) {
     const missingField = blankCountFields[0];
     const missingValue = values.total - countTotal;
     if (missingValue < 0) {
-      setFormError('Counts exceed Total.');
+      setFieldError(totalCountInput, 'Counts exceed Total.');
+      scrollToField(totalCountInput);
       return;
     }
 
     values[missingField] = missingValue;
   } else if (countTotal > values.total) {
-    setFormError('Counts exceed Total.');
+    setFieldError(totalCountInput, 'Counts exceed Total.');
+    scrollToField(totalCountInput);
     return;
   } else if (countTotal < values.total) {
-    setFormError('Counts must equal Total. Fill remaining fields or adjust Total.');
+    setFieldError(totalCountInput, 'Counts must equal Total.');
+    scrollToField(totalCountInput);
     return;
   }
 
   if (values.total < countTotal) {
-    setFormError('Counts exceed Total.');
+    setFieldError(totalCountInput, 'Counts exceed Total.');
+    scrollToField(totalCountInput);
     return;
   }
 
