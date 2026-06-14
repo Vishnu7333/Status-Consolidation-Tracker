@@ -336,6 +336,14 @@ td {
   font-size: 0.95rem;
 }
 
+.comment-cell {
+  max-width: 280px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
 .module-header-row td {
   padding-top: 1.1rem;
   padding-bottom: 0.6rem;

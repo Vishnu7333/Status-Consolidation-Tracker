@@ -182,7 +182,7 @@ function createRow(record, index) {
     <td class="status-onhold">${record.onhold}</td>
     <td class="status-pending">${record.pending}</td>
     <td><span class="status-badge ${getStatusClass(status)}">${status}</span></td>
-    <td>${record.comments || '-'}</td>
+    <td class="comment-cell">${record.comments || '-'}</td>
     <td>
       <button class="remove-button" data-index="${index}" aria-label="Remove record">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -631,11 +631,13 @@ function buildCellStyle(thinBorder, rowIndex, columnIndex, grandTotalRowIndex) {
   const isProjectRow = rowIndex === 0;
   const isGrandTotalRow = rowIndex === grandTotalRowIndex;
   const isNumericColumn = columnIndex >= 2 && columnIndex <= 6;
+  const isCommentsColumn = columnIndex === 8;
 
   const style = {
     alignment: {
       horizontal: isProjectRow || isHeaderRow ? 'center' : isNumericColumn ? 'center' : 'left',
       vertical: 'center',
+      wrapText: isCommentsColumn,
     },
     border: thinBorder,
   };
