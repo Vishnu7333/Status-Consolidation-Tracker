@@ -635,7 +635,7 @@ function buildCellStyle(thinBorder, rowIndex, columnIndex, grandTotalRowIndex) {
 
   const style = {
     alignment: {
-      horizontal: isProjectRow || isHeaderRow ? 'center' : isNumericColumn ? 'center' : 'left',
+      horizontal: 'center',
       vertical: 'center',
       wrapText: isCommentsColumn,
     },
@@ -643,7 +643,7 @@ function buildCellStyle(thinBorder, rowIndex, columnIndex, grandTotalRowIndex) {
   };
 
   if (isGrandTotalRow) {
-    style.alignment.horizontal = columnIndex === 0 ? 'left' : 'center';
+    style.alignment.horizontal = 'center';
     style.fill = { fgColor: { rgb: 'FFF2CC' } };
   }
 
@@ -755,7 +755,7 @@ async function downloadExcel() {
       const cellRef = XLSX.utils.encode_cell({ r: merge.s.r, c: merge.s.c });
       if (summarySheet[cellRef]) {
         summarySheet[cellRef].s = {
-          alignment: { horizontal: 'left', vertical: 'top' },
+          alignment: { horizontal: 'center', vertical: 'top' },
           font: { bold: true },
           border: thinBorder,
         };
@@ -771,7 +771,7 @@ async function downloadExcel() {
 
       if (summarySheet[cellRef]) {
         summarySheet[cellRef].s = {
-          alignment: { horizontal: columnIndex === 0 ? 'left' : 'center', vertical: 'center' },
+          alignment: { horizontal: 'center', vertical: 'center' },
           border: thinBorder,
           fill: { fgColor: { rgb: 'FFF2CC' } },
           font: { bold: true, sz: 13, color: { rgb: '7F6000' } },
