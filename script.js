@@ -23,6 +23,21 @@ const exportImageButton = document.getElementById('export-image');
 
 const records = [];
 
+// Add real-time validation for alphabets only in Project Name, Module, and Submodule
+function validateAlphabetsOnly(input) {
+  input.addEventListener('input', (e) => {
+    const value = e.target.value;
+    const filtered = value.replace(/[^A-Za-z ]/g, '');
+    if (value !== filtered) {
+      e.target.value = filtered;
+    }
+  });
+}
+
+validateAlphabetsOnly(projectNameInput);
+validateAlphabetsOnly(moduleInput);
+validateAlphabetsOnly(submoduleInput);
+
 function readOptionalCount(input) {
   const rawValue = input.value.trim();
   if (rawValue === '') {

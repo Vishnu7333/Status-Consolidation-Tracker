@@ -11,7 +11,7 @@
     <div class="project-banner">
       <label class="project-name-field">
         Project Name
-        <input id="project-name" type="text" placeholder="Enter project name" required />
+        <input id="project-name" type="text" pattern="[A-Za-z ]+" placeholder="Enter project name" title="Letters only" required />
       </label>
       <p class="project-display">Project: <span id="project-display">Untitled Project</span></p>
     </div>
@@ -26,11 +26,11 @@
         <form id="testcase-form">
           <label>
             Module
-            <input id="module-name" type="text" placeholder="Module name (e.g. SCM, Fin, HCM)" required />
+            <input id="module-name" type="text" pattern="[A-Za-z ]+" placeholder="Module name (e.g. SCM, Fin, HCM)" title="Letters only" required />
           </label>
           <label>
             Submodule
-            <input id="submodule-name" type="text" placeholder="Submodule name (e.g. AR, AP, GL)" required />
+            <input id="submodule-name" type="text" pattern="[A-Za-z ]+" placeholder="Submodule name (e.g. AR, AP, GL)" title="Letters only" required />
           </label>
           <label>
             Total
