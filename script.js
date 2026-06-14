@@ -153,6 +153,10 @@ function getModuleStatus(summary) {
   return 'Pending';
 }
 
+function getStatusClass(status) {
+  return `status-${status.toLowerCase().replace(/\s+/g, '')}`;
+}
+
 function createModuleHeaderRow(moduleName, moduleSummary) {
   const status = getModuleStatus(moduleSummary);
   const tr = document.createElement('tr');
@@ -177,9 +181,19 @@ function createRow(record, index) {
     <td class="status-fail">${record.fail}</td>
     <td class="status-onhold">${record.onhold}</td>
     <td class="status-pending">${record.pending}</td>
-    <td>${status}</td>
+    <td><span class="status-badge ${getStatusClass(status)}">${status}</span></td>
     <td>${record.comments || '-'}</td>
-    <td><button class="remove-button" data-index="${index}" aria-label="Remove record">×</button></td>
+    <td>
+      <button class="remove-button" data-index="${index}" aria-label="Remove record">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18" />
+          <path d="M8 6V4h8v2" />
+          <path d="M19 6l-1 14H6L5 6" />
+          <path d="M10 11v5" />
+          <path d="M14 11v5" />
+        </svg>
+      </button>
+    </td>
   `;
   return tr;
 }

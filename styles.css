@@ -142,6 +142,17 @@ button:hover {
   line-height: 1;
 }
 
+.remove-button svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
 .remove-button:hover {
   background: rgba(255, 106, 112, 0.25);
 }
@@ -174,18 +185,18 @@ button:hover {
   display: grid;
   gap: 0.35rem;
   padding: 1.1rem;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(48, 79, 255, 0.18), rgba(82, 198, 255, 0.12));
-  border: 1px solid rgba(94, 149, 255, 0.35);
-  box-shadow: 0 14px 30px rgba(8, 24, 64, 0.18);
+  border-radius: 16px;
+  background: rgba(30, 38, 54, 0.86);
+  border: 1px solid rgba(210, 216, 226, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 14px 30px rgba(0, 0, 0, 0.16);
 }
 
-.summary-grid div:nth-child(1) { background: linear-gradient(135deg, rgba(111, 197, 255, 0.2), rgba(31, 57, 255, 0.18)); }
-.summary-grid div:nth-child(2) { background: linear-gradient(135deg, rgba(255, 175, 189, 0.18), rgba(255, 120, 150, 0.16)); }
-.summary-grid div:nth-child(3) { background: linear-gradient(135deg, rgba(145, 255, 199, 0.18), rgba(52, 193, 145, 0.16)); }
-.summary-grid div:nth-child(4) { background: linear-gradient(135deg, rgba(255, 206, 122, 0.18), rgba(255, 143, 64, 0.16)); }
-.summary-grid div:nth-child(5) { background: linear-gradient(135deg, rgba(255, 179, 204, 0.16), rgba(212, 95, 244, 0.16)); }
-.summary-grid div:nth-child(6) { background: linear-gradient(135deg, rgba(162, 135, 255, 0.18), rgba(64, 175, 255, 0.14)); }
+.summary-grid div:nth-child(1) { background: rgba(39, 51, 70, 0.9); border-color: rgba(134, 158, 188, 0.24); }
+.summary-grid div:nth-child(2) { background: rgba(57, 50, 43, 0.9); border-color: rgba(192, 170, 132, 0.24); }
+.summary-grid div:nth-child(3) { background: rgba(36, 58, 48, 0.9); border-color: rgba(122, 178, 145, 0.24); }
+.summary-grid div:nth-child(4) { background: rgba(64, 43, 45, 0.9); border-color: rgba(192, 126, 130, 0.24); }
+.summary-grid div:nth-child(5) { background: rgba(61, 55, 43, 0.9); border-color: rgba(192, 170, 118, 0.24); }
+.summary-grid div:nth-child(6) { background: rgba(46, 52, 67, 0.9); border-color: rgba(148, 160, 184, 0.24); }
 
 .summary-grid span {
   font-size: 1.75rem;
@@ -356,10 +367,53 @@ td {
   color: #ffd54f;
 }
 
+.status-inprogress {
+  color: #76d7ff;
+}
+
 .status-pass,
 .status-fail,
-.status-onhold {
+.status-onhold,
+.status-inprogress {
   font-weight: 700;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-width: 6.4rem;
+  justify-content: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  background: rgba(231, 236, 255, 0.08);
+  border: 1px solid rgba(231, 236, 255, 0.12);
+}
+
+.status-badge.status-pass {
+  background: rgba(77, 181, 114, 0.16);
+  border-color: rgba(109, 245, 164, 0.26);
+}
+
+.status-badge.status-fail {
+  background: rgba(190, 74, 80, 0.16);
+  border-color: rgba(255, 106, 112, 0.26);
+}
+
+.status-badge.status-onhold {
+  background: rgba(185, 133, 55, 0.17);
+  border-color: rgba(255, 196, 105, 0.28);
+}
+
+.status-badge.status-pending {
+  background: rgba(174, 145, 44, 0.17);
+  border-color: rgba(255, 213, 79, 0.28);
+}
+
+.status-badge.status-inprogress {
+  background: rgba(67, 134, 162, 0.18);
+  border-color: rgba(118, 215, 255, 0.3);
 }
 
 .empty-state {
