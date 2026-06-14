@@ -95,6 +95,10 @@ function getStatus(record) {
     return 'Pass';
   }
 
+  if (record.pending > 0 && (record.pass > 0 || record.fail > 0)) {
+    return 'Inprogress';
+  }
+
   if (record.fail > 0) {
     return 'Fail';
   }
@@ -128,6 +132,10 @@ function groupByModule() {
 function getModuleStatus(summary) {
   if (summary.total > 0 && summary.pass === summary.total) {
     return 'Pass';
+  }
+
+  if (summary.pending > 0 && (summary.pass > 0 || summary.fail > 0)) {
+    return 'Inprogress';
   }
 
   if (summary.fail > 0) {
